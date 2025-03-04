@@ -1,7 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const qs = require('querystring');
-// const { Buffer } = require('node:buffer');
+const { Buffer } = require('node:buffer');
 
 
 const server = http.createServer(function(request, response){
@@ -30,16 +30,15 @@ const server = http.createServer(function(request, response){
                 // console.log(data.toString('utf8',0,20));
                 // const buf1 = Buffer.from(data.toString(),'utf8');
                 // console.log(buf1.toString());
-
-                // * name과 value를 분리 -> 문자열 변환 후 '=' 기준으로 분리
-                let dataTrans = data.toString().split('=');
-                console.log(dataTrans[1]);
-
                 // console.log(data.toString());   
-
                 // const dataGet = data.toString('utf8');
-
-
+                // * name과 value를 분리 -> 문자열 변환 후 '=' 기준으로 분리
+                // let dataTrans = data.toString().split('=');
+                // console.log(dataTrans[1].toString());
+                
+                let decoder = new TextDecoder();
+                let str = decoder.decode(data,'utf8');
+                console.log(str);
 
                 // let textHTML = `<!DOCTYPE html>
                 // <html lang="en">
@@ -49,11 +48,11 @@ const server = http.createServer(function(request, response){
                 //     <title>Document</title>
                 // </head>
                 // <body>
-                //     <h1>${data.toString()}</h1>
+                //     <h1>${dataTrans[1].toString()}</h1>
                 // </body>
                 // </html>`;
 
-                // fs.writeFileSync(`test.html`,textHTML);
+                // fs.writeFileSync(`test.html`,textHTML,'utf8');
             })
         }
     }
