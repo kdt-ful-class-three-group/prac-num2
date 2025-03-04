@@ -27,32 +27,37 @@ const server = http.createServer(function(request, response){
             // * request가 data가 들어오면 실행
             request.on('data',function(data){
 
-                // console.log(data.toString('utf8',0,20));
-                // const buf1 = Buffer.from(data.toString(),'utf8');
-                // console.log(buf1.toString());
-                // console.log(data.toString());   
-                // const dataGet = data.toString('utf8');
                 // * name과 value를 분리 -> 문자열 변환 후 '=' 기준으로 분리
-                // let dataTrans = data.toString().split('=');
-                // console.log(dataTrans[1].toString());
-                
-                let decoder = new TextDecoder();
-                let str = decoder.decode(data,'utf8');
-                console.log(str);
+                // * [0] = name , [1] = value
+                let dataTrans = data.toString().split('=');
+                // * 한글 사용시 16진수 표현
+                console.log(dataTrans[1].toString());
+                // * URL 인코딩 -> 16진수 변환
+                const charDecode = decodeURIComponent(dataTrans[1]);
+                console.log(charDecode);
 
-                // let textHTML = `<!DOCTYPE html>
-                // <html lang="en">
-                // <head>
-                //     <meta charset="UTF-8">
-                //     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                //     <title>Document</title>
-                // </head>
-                // <body>
-                //     <h1>${dataTrans[1].toString()}</h1>
-                // </body>
-                // </html>`;
+                // * 리터럴로 HTML 표현
+                let textHTML = `<!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Document</title>
+                </head>
+                <body>
+                    <h1>${charDecode}</h1>
+                </body>
+                </html>`;
 
-                // fs.writeFileSync(`test.html`,textHTML,'utf8');
+                // * 파일 생성 : file, data, encode-type
+                fs.writeFileSync(`test.html`,textHTML,'utf8');
+
+                // * 파일 읽기 
+                response.statusCode = 200; // OK
+                response.setHeader('Content-Type', 'text/html; charset=utf-8');
+                const createdData = fs.readFileSync("./test.html");
+                response.write(createdData);
+                response.end();
             })
         }
     }
