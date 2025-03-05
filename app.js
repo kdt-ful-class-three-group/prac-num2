@@ -11,16 +11,20 @@ const server = http.createServer(function(request, response){
     // 테스트 요청 URL : /
 
     if(request.method === 'GET'){
-        if(request.url === '/'){
+        
+        if(request.url === '/' || request.url === '/index.html'){
             // 최초접속시도 확인
             console.log("최초접속시도");
-            response.statusCode = 200; // OK
-            response.setHeader('Content-Type', 'text/html; charset=utf-8');
             const data = fs.readFileSync("./index.html");
-            response.write(data);
-            response.end();
+            response.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'}).end(data);
+        }
+        // * 404 페이지 테스트
+        else{
+            const data = fs.readFileSync("./page/404page.html");
+            response.writeHead(404, {'Content-Type': 'text/html; charset=utf-8'}).end(data);
         }
     }
+    
     if(request.method === 'POST'){
         if(request.url === '/yohoon'){
             // * request가 data가 들어오면 실행
@@ -50,7 +54,12 @@ const server = http.createServer(function(request, response){
                 response.write(createdData);
                 response.end();
             })
-
+        }
+        
+        // * 404 페이지 테스트
+        else{
+            const data = fs.readFileSync("./page/404page.html");
+            response.writeHead(404, {'Content-Type': 'text/html; charset=utf-8'}).end(data);
         }
     }
 })
