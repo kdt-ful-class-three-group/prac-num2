@@ -18,11 +18,20 @@ const server = http.createServer(function(request, response){
             const data = fs.readFileSync("./index.html");
             response.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'}).end(data);
         }
+
+        else if(request.url === '/src/script.js'){
+            console.log("DOM js 확인")
+            const data = fs.readFileSync("./src/script.js");
+            response.writeHead(200, {'Content-Type': 'application/javascript; charset=utf-8'}).end(data);
+        }
+        
         // * 404 페이지 테스트
         else{
             const data = fs.readFileSync("./page/404page.html");
             response.writeHead(404, {'Content-Type': 'text/html; charset=utf-8'}).end(data);
         }
+
+
     }
     
     if(request.method === 'POST'){
