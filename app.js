@@ -1,7 +1,20 @@
 const http = require('http');
 const fs = require('fs');
 const qs = require('querystring');
-const { Buffer } = require('node:buffer');
+
+
+function spliceData(data ,callback){
+    // * query에서 '&' 분리
+    let dataTrans = data.split('&');
+    let charSave = [];
+    dataTrans.forEach(element => {
+        // * key와 value에서 '=' 분리
+        let splitData = element.split('=')
+        // * 16진수 URL 디코딩 및 value 값 추출하여 배열 저장
+        charSave.push(decodeURIComponent(splitData[1]));
+    });
+    callback(charSave);
+}
 
 
 const server = http.createServer(function(request, response){
@@ -26,15 +39,16 @@ const server = http.createServer(function(request, response){
         if(request.url === '/yohoon'){
             // * request가 data가 들어오면 실행
             request.on('data',function(data){
-
+                let getData = data.toString();
+                // * decode 된 데이터 저장
+                let charDecode;
+                
                 // * name과 value를 분리 -> 문자열 변환 후 '=' 기준으로 분리
                 // * [0] = name , [1] = value
-                let dataTrans = data.toString().split('=');
-                // * 한글 사용시 16진수 표현
-                console.log(dataTrans[1].toString());
-                // * URL 인코딩 -> 16진수 변환
-                const charDecode = decodeURIComponent(dataTrans[1]);
-                console.log(charDecode);
+                // * callback => string 데이터를 변환(한글 가능)
+                spliceData(getData, function(cutData){
+                    charDecode = cutData;
+                })
 
                 // * 리터럴로 HTML 표현
                 let textHTML = `<!DOCTYPE html>
@@ -45,12 +59,13 @@ const server = http.createServer(function(request, response){
                     <title>Document</title>
                 </head>
                 <body>
-                    <h1>${charDecode}</h1>
+                    <h1>${charDecode[0]}</h1>
+                    <h1>${charDecode[1]}</h1>
                 </body>
                 </html>`;
 
                 // * 파일 생성 : file, data, encode-type
-                fs.writeFileSync(`test.html`,textHTML,'utf8');
+                fs.writeFileSync('test.html',textHTML,'utf8');
 
                 // * 파일 읽기 
                 response.statusCode = 200; // OK
@@ -59,6 +74,7 @@ const server = http.createServer(function(request, response){
                 response.write(createdData);
                 response.end();
             })
+
         }
     }
 })
