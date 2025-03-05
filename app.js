@@ -4,6 +4,19 @@ const qs = require('querystring');
 const spliceData = require('./src/spliceData.js');
 const makeTextHTML = require('./src/literal.js');
 
+
+function pathFinder(url){
+    const httpHeader = {
+        html : {'Content-Type' : 'text/html; charset=utf-8'},
+        js : {'Content-Type' : 'application/javascript; charset=utf-8'}
+    }
+
+    if(url === '/' || url === '/index.html'){
+        return httpHeader.html;
+    }
+
+}
+
 const server = http.createServer(function(request, response){
     console.log("테스트 요청 방식 :",request.method);
     console.log("테스트 요청 URL :",request.url);
@@ -13,10 +26,13 @@ const server = http.createServer(function(request, response){
     if(request.method === 'GET'){
         
         if(request.url === '/' || request.url === '/index.html'){
+            let path;
             // 최초접속시도 확인
             console.log("최초접속시도");
+            // * header 경로 찾기
+            path = pathFinder(request.url)
             const data = fs.readFileSync("./index.html");
-            response.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'}).end(data);
+            response.writeHead(200, path).end(data);
         }
         // * 404 페이지 테스트
         else{
